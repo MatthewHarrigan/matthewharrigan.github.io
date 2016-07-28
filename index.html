@@ -1,0 +1,217 @@
+<!doctype html>
+<head>
+</head>
+
+<body>
+
+  <section class="preference">
+
+    <div>
+      <div class="caption red">Servo position</div>
+      <label for="red" class="brightness fa">
+        <input id="red" type="range" min="0" max="255" step="1" value="0">
+      </label>
+    </div>
+
+<!-- <div id="start">
+  Start
+</div>
+<div id="finish">
+  Finish
+</div> -->
+
+<div id="random">
+  Randomise
+</div>
+
+<div id="beer">
+  Beer
+</div>
+
+<!--
+
+<div id="tea">
+  Tea
+</div>
+
+<div id="coffee">
+  Coffee
+</div>
+
+<div id="doughnut">
+  Doughnut
+</div>
+
+<div id="icecream">
+  Ice cream
+</div> -->
+
+<div>
+    <div class="button">BBC Canteen</div>
+    <div class="button">Booths</div>
+    <div class="button">Cau</div>
+    <div class="button">Costa Coffee</div>
+    <div class="button">Damson</div>
+    <div class="button">The Dockyard</div>
+    <div class="button">Love Conquers All</div>
+    <div class="button">Marco's</div>
+    <div class="button">Nando's</div>
+    <div class="button">Pizza Express</div>
+    <div class="button">Lowry Outlet</div>
+    <div class="button">Sandwiches</div>
+    <div class="button">Pokusevski's</div>
+    <div class="button">Pret</div>
+    <div class="button">Prezzo</div>
+    <div class="button">Wagamama</div>
+</div>
+
+
+  </section>
+
+
+  <script src="http://cdn.pubnub.com/pubnub-3.7.15.min.js"></script>
+  <script>
+(function(){
+
+  var buttons = document.querySelectorAll('.button'),
+      position = 179;
+
+  for (var i = 0; i < buttons.length; i += 1) {
+      (function (position) {
+          console.log(position);
+          buttons[i].addEventListener('click', function () {
+              brightness.r = Math.round(position).toString();
+              publishUpdate(brightness);
+
+          });
+      } )(position);
+      position -= 11.1875;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  var pubnub = PUBNUB.init({
+    publish_key: 'pub-c-2542afca-4c50-4db3-9d2e-699ee68c2354',
+    subscribe_key: 'sub-c-a594677a-50c9-11e6-ba28-02ee2ddab7fe'
+  });
+
+  var channel = 'Channel-me3iemwc1';
+
+  var red = document.getElementById('red');
+  // var green = document.getElementById('green');
+  // var blue = document.getElementById('blue');
+
+  // Initial brightness statek
+  var brightness = {r: 0, g: 0, b: 0};
+
+
+  // UI Reset: Subscribe data from all subscibers of the channel to set the state correctly
+
+  pubnub.subscribe({
+    channel: channel,
+    message: resetSliders, // reset the slider UI every time a subscriber makes a change
+    connect: initSliders // initialize the slider states for the fisrt time launching the app
+  });
+
+  function resetSliders(m) {
+    red.value = brightness.r = m.r;
+    // green.value = brightness.g = m.g;
+    // blue.value = brightness.b = m.b;
+  }
+
+  function initSliders() {
+    pubnub.history({
+      channel: channel,
+      count: 1,
+      callback: function(messages) {
+        messages[0].forEach(function(m) {
+          console.log(m);
+          resetSliders(m);
+        });
+      }
+    });
+  }
+
+  function publishUpdate(data) {
+    console.log(data);
+
+    pubnub.publish({
+      channel: channel,
+      message: data
+    });
+  }
+
+  // UI EVENTS
+
+  red.addEventListener('change', function(e){
+    brightness.r = this.value;
+    publishUpdate(brightness);
+  }, false);
+
+  // green.addEventListener('change', function(e){
+  //   brightness.g = this.value;
+  //   publishUpdate(brightness);
+  // }, false);
+  //
+  // blue.addEventListener('change', function(e){
+  //   brightness.b = this.value;
+  //   publishUpdate(brightness);
+  // }, false);
+
+  // document.getElementById("start").addEventListener("click", function( event ) {
+  //   console.log(event)
+  //   brightness.r = '179';
+  //   publishUpdate(brightness);
+  //  }, false);
+  //
+  //  document.getElementById("finish").addEventListener("click", function( event ) {
+  //    brightness.r = '10';
+  //    publishUpdate(brightness);
+  //   }, false);
+
+    document.getElementById("random").addEventListener("click", function( event ) {
+      brightness.r = 'random';
+      publishUpdate(brightness);
+     }, false);
+
+     document.getElementById("beer").addEventListener("click", function( event ) {
+       brightness.r = 'beer';
+       publishUpdate(brightness);
+    }, false);
+//
+//     document.getElementById("beer").addEventListener("click", function( event ) {
+//       brightness.r = 'tea';
+//       publishUpdate(brightness);
+//    }, false);
+//
+//    document.getElementById("coffee").addEventListener("click", function( event ) {
+//      brightness.r = 'coffee';
+//      publishUpdate(brightness);
+//   }, false);
+//
+//   document.getElementById("doughnut").addEventListener("click", function( event ) {
+//     brightness.r = 'doughnut';
+//     publishUpdate(brightness);
+//  }, false);
+//
+//  document.getElementById("icecream").addEventListener("click", function( event ) {
+//    brightness.r = 'icecream';
+//    publishUpdate(brightness);
+// }, false);
+
+
+
+})();
+  </script>
+
+</body>
+</html>
